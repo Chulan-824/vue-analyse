@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div id="app">{{arr}}</div>
+  <script src="dist/vue.js"></script>
+
+  <script>
+    let vm = new Vue({
+      el: '#app',
+      data() {
+        return {
+          arr: [{name: 'chulan'},{name:'baobao'}]
+        }
+      }
+    })
+
+
+
+
+
+
+
+    
+    /*
+      用户很少通过索引来操作数组 arr[82] = 1000
+      内部就想到不对索引进行拦截 因为性能消耗严重
+      内部数组不会采用defineProperty
+
+      所以vue 对push shift pop unshift reverse sort splice 7个变异方法
+      就会更改原数组
+
+      数组没有监控所以的变化 但是索引对应的内容是对象类型 需要被监控
+    */
+  
+  </script>
+</body>
+</html>
