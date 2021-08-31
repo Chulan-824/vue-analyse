@@ -7,7 +7,11 @@
   <title>Document</title>
 </head>
 <body>
-  <div id="app">{{arr}}</div>
+  <div id="app" a="1" b="2">
+    <ul>
+      <li>{{name}}</li>
+    </ul>
+  </div>
   <script src="dist/vue.js"></script>
 
   <script>
@@ -15,16 +19,10 @@
       el: '#app',
       data() {
         return {
-          arr: [{name: 'chulan'},{name:'baobao'}]
+          name: 'chulan'
         }
       }
     })
-
-
-
-
-
-
 
     
     /*

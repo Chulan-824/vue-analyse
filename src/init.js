@@ -1,3 +1,4 @@
+import { compileToFunction } from "./compiler/index.js";
 import { initState } from "./state";
 
 // 关于初始化的方法扩展，单独放该文件定义
@@ -16,13 +17,18 @@ export function initMixin(Vue) {  // 表示在vue的基础上做一次混合操�
 
   Vue.prototype.$mount = function (el) {
     const vm = this;
+    const options = vm.$options
     el = document.querySelector(el);
 
     // 把模板转换成渲染函数 => 虚拟dom概念 vnode => diff算法 更新虚拟dom => 产生真实节点 更新
     if (!vm.$options.render) {  // 用户可能直接写render方法 暂时是没写的情况
       let template = options.template; // 没有render用template
+      if (!template && el) { // 用户也没有传递template 就去el的内容作为模板
+        template = el.outerHTML;  // 得到模板的字符串  
+        let render = compileToFunction(template)  // 通过编译模块 将得到的模板字符串编译为render函数
+        options.render = render
+      }
     }
-
-    console.log(el);
+    // options.render 就是渲染函数
   }
 } 
