@@ -118,3 +118,10 @@ export function parserHTML(html) { // <div id="app">123123</div> => 123123</div>
 
   return root;
 }
+
+// 看一下用户是否传入了 render 没有则看是否有 template 没有则直接将html解析
+// html => 词法解析 (开始标签 结束标签 属性 文本)
+// => ast语法树 用来描述html语法 stack=[]
+// codegen <div>hello</div> => _c('div',{},'hello') => 让字符串执行
+
+// 模板引擎 都是用 new Function + with 来实现
