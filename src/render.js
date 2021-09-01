@@ -19,7 +19,6 @@ export function renderMixin(Vue) {
     
     let vnode = render.call(vm); // 这里运行的时候 会出错 因为我们之前编译code的时候里面有自己定义的_c_v_s函数 所以需要在原型上定义一下(同上)
 
-    console.log(vnode);
     return vnode
   }
 }

@@ -1,6 +1,11 @@
+import { patch } from "./vdom/patch";
+
 export function lifecycleMixin(Vue) {
   Vue.prototype._update = function (vnode) {
-    console.log('update');
+    // 这里初始化的时候需要调用 更新的时候也需要调用
+    const vm = this;
+
+    patch(vm.$el, vnode); // 比较前后虚拟节点的差异
   }
 }
 

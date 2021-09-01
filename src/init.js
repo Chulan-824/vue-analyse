@@ -20,7 +20,7 @@ export function initMixin(Vue) {  // 表示在vue的基础上做一次混合操�
     const vm = this;
     const options = vm.$options
     el = document.querySelector(el);
-
+    vm.$el = el;
     // 把模板转换成渲染函数 => 虚拟dom概念 vnode => diff算法 更新虚拟dom => 产生真实节点 更新
     if (!vm.$options.render) {  // 用户可能直接写render方法 暂时是没写的情况
       let template = options.template; // 没有render用template
