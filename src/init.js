@@ -1,4 +1,5 @@
 import { compileToFunction } from "./compiler/index.js";
+import { mountComponent } from "./lifecycle.js";
 import { initState } from "./state";
 
 // 关于初始化的方法扩展，单独放该文件定义
@@ -29,6 +30,11 @@ export function initMixin(Vue) {  // 表示在vue的基础上做一次混合操�
         options.render = render
       }
     }
-    // options.render 就是渲染函数
+    // options.render 就是渲染函数 调用render方法 渲染成真实dom 替换成页面的内容
+    // console.log(options.render);
+
+    // 有了render方法后就要实现组件的挂在 new Vue这个过程就是生成一个组件 组件可以实现一个组件的挂载
+    
+    mountComponent(vm, el);  // 将vm实例挂载到el上 组件的挂在流程
   }
 } 

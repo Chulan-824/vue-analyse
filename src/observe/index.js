@@ -41,7 +41,6 @@ function defineReactive(data, key, value) {  // 定义响应式 value 有可能�
 
   Object.defineProperty(data, key, {
     get() {
-      console.log('get', data, key);
       return value
     },
     set(newVal) {

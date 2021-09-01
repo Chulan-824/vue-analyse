@@ -33,7 +33,6 @@ function gen(el) {
      
       while (match = defaultTagRE.exec(text)) {  // 看是否有匹配到
         let index= match.index; // 开始索引
-        console.log(match);
         if (index > lastIndex) {
           tokens.push(JSON.stringify(text.slice(lastIndex, index))) // 匹配的内容为 hello 到{的索引内容
         }
@@ -64,7 +63,8 @@ export function generate(el) {  // _c('div', { id: 'app', a: '1' }, _c('span', {
   // _c('div', { id: 'app', a: '1' }, 'hello') 将ast拼接成上述字符串 再把字符串转换成函数
   // 遍历树 将树形成字符串
   let children = getChildren(el)
-  let code = `_c("${el.tag}",${el.attrs.length ? getProps(el.attrs) : 'undefined'})${children?`,${children}`:''}`
+  let code = `_c("${el.tag}",${el.attrs.length ? getProps(el.attrs) : 'undefined'
+    }${children ? `,${children}` : ''})`
 
   return code
 }
