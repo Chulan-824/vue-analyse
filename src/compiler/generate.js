@@ -65,6 +65,5 @@ export function generate(el) {  // _c('div', { id: 'app', a: '1' }, _c('span', {
   let children = getChildren(el)
   let code = `_c("${el.tag}",${el.attrs.length ? getProps(el.attrs) : 'undefined'
     }${children ? `,${children}` : ''})`
-
   return code
 }

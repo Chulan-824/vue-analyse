@@ -35,5 +35,8 @@ methods.forEach(method => {
     if (inserted) {  //  如果有新增的值 在进行劫持 需要观察的是数组的每一项
       ob.observeArray(inserted)
     }
+
+    // 数组的observer.dep 属性
+    ob.dep.notify();
   }
 })

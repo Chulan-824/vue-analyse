@@ -6,10 +6,13 @@ export function patch(oldVnode, vnode) {
     const parentElm = oldVnode.parentNode; // 找到父节点
 
     let elm = createElm(vnode); // 根据虚拟节点 创建元素
-    console.log(elm);
+    
+    // 在第一次渲染后 是删除老节点 下次再使用无法获取 所以要返回新的节点 替换$el
     parentElm.insertBefore(elm, oldVnode.nextSibling); // 讲新创建的节点放在老节点的下一个节点中(在哪删除 就在哪新增) 此处不能append 不然就让在最后一个节点上
  
     parentElm.removeChild(oldVnode);  // 在父节点中 产出老节点
+
+    return elm
   }
 }
 
