@@ -1,5 +1,20 @@
 import { observe } from "./observe/index.js";
+import Watcher from "./observe/watcher.js";
 import { isFunction } from "./utils";
+
+
+export function stateMixin(Vue) {
+  Vue.prototype.$watch = function (key, handler, options = {}) {
+    options.user = true; // 给options新增用户属性 表示为用户watcher
+
+    // vm name 用户回调 options.user
+    new Watcher(this, key, handler, options);
+
+    // if (options.immediate) { // 立即执行
+    //   handler(new Watcher(this, key, handler, options).value);
+    // }
+  }
+}
 
 export function initState(vm) {
   const opts = vm.$options;
@@ -9,9 +24,9 @@ export function initState(vm) {
   // if (opts.computed) {
     
   // }
-  // if (opts.watch) {
-    
-  // }
+  if (opts.watch) { // 初始化watch
+    initWatch(vm, opts.watch)
+  }
   
 }
 
@@ -41,4 +56,24 @@ function initData(vm) {
 
   observe(data); // 观测数据 单独放observe文件下维护改方法
 
+}
+
+function initWatch(vm, watch) {
+  for (let key in watch) { // 此处也可以用Object.key()遍历 这样就不会遍历出原型链的属性
+    console.log(key);
+
+    let handler = watch[key]; // handle可能是函数 可能是数组(多个函数) 可能是字符串(直接去method取值 暂时不考虑)
+
+    if (Array.isArray(handler)) {
+      for (let i = 0; i < handler.length; i++) {
+        createWatcher(vm, key, handler[i]);
+      }
+    } else {
+      createWatcher(vm, key, handler);
+    }
+  }
+}
+
+function createWatcher(vm, key, handler) {
+  return vm.$watch(key, handler)
 }

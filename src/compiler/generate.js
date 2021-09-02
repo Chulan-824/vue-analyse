@@ -36,7 +36,6 @@ function gen(el) {
         if (index > lastIndex) {
           tokens.push(JSON.stringify(text.slice(lastIndex, index))) // 匹配的内容为 hello 到{的索引内容
         }
-
         tokens.push(`_s(${match[1].trim()})`)  // 取出 {{}} 中间的内容  _s原理就是JSON.stringify 避免口号中间的内容是一个对象 [Object Object]
 
         lastIndex = index + match[0].length; // 结束索引
@@ -45,7 +44,6 @@ function gen(el) {
         tokens.push(JSON.stringify(text.slice(lastIndex)))
       }
       return `_v(${tokens.join('+')})`
-      
     }
     
   }

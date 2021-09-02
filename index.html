@@ -9,7 +9,6 @@
 <body>
   <div id="app" a="1" style="color:red;background: blue">
     hello ({{name}}) world
-    {{arr}}
   </div>
   <script src="dist/vue.js"></script>
 
@@ -17,18 +16,44 @@
     let vm = new Vue({
       data() {
         return {
-          name: {
-            name: '楚岚'
-          },
-          arr: [[1,2,3]]
-        }
+          name: '楚岚',
+          age: {
+            n: 1
+          }
+        } 
+      },
+
+      watch: {
+        name(newV, oldV) {
+          console.log(newV, oldV);
+        },
+        // 'age.n'(){},
+        // name: [function(a,b) {}, function(c, d) {}],
+        // name: 'a'
+      },
+
+      method: {
+        a() {},
       }
     })
 
     vm.$mount('#app')
     setTimeout(() => {
-      vm.arr[0].push(456)
+      vm.name = 'baobao'
     }, 1000)
+
+    /**
+     * watcher 有 渲染watcher 用户wacher(watch) 计算属性watcher
+     * 基本思路:
+     * 初始化watch时 => 拿取watch对象的所有属性和值 => 判断值的类型(函数/数组) => 每个函数创建对应的watcher(数组拆分之后创建)
+     * => 封装成$watch方法用来创建watcher(new Watcher(vm, name, 用户回调, options.user)) => watcher类中将user绑定user 用户回调绑定cb
+     * => 判断name(expOrFn) fn直接赋值给watcher的getter方法(此处fn为渲染watcher创建时传入的updateComponent) 表达式(用户watcher)用.分割转换成getter函数(用于之后watcher初始化get()时执行)
+     * => watcher创建默认会执行一次get()方法——getter()方法(上部分转化的函数) getter()返回对应的属性(进行取值操作) 将该属性保存用get()方法返回 记录当前vulue值(老值/初始化值) watcher this.value
+     * => 上述 getter()返回对应的属性(进行取值操作) => observer get()方法 记录当前用户watcher依赖
+     * => 之后用户更新会走watcher run()方法 => 判断是否为用户watcher(user)
+     * => 用户watcher则触发用户watcher run()方法 => 新旧值传入用户回调并执行
+     * /
+
     
 
     // setTimeout(()=> {

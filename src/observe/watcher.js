@@ -5,18 +5,34 @@ let id = 0;
 class Watcher {
   // vm, updateComponent(), () => {console.log('自定义callback 属性更新了!');}, true
   constructor(vm, exprOrFn, cb, options) {
+    // exprOrFn 之前传的是updateComponent 现在传的是watch里面的key
     this.vm = vm;
     this.exprOrFn = exprOrFn;
     this.cb = cb;
     this.options = options;
+    this.user = !!options.user; // 判断是不是用户watcher
     this.id = id++; // 给watcher增加一个唯一标识
 
     // 默认应该让exprOrFn执行 exprOrFn 方法执行后 调用了render方法 (去vm上取值了)
-    this.getter = exprOrFn;
+    if (typeof exprOrFn === 'string') {
+      this.getter = function () { // 需要将表达式转换成函数
+        // 当我数据取值时 会进行依赖收集 收集当前用户的用户watcher
+
+        // 假如watch 属性为 'age.n' 需要转换为 vm['age']['n']
+        let path = exprOrFn.split('.'); // [age,n]
+        let obj = vm;
+        for (let i = 0; i < path.length; i++) {
+          obj = obj[path[i]];
+        }
+        return obj; // 这里会取值 走observe的get方法=>然后Dep.target存放的就是当前的watcher实例(pushTarget(this))
+      }
+    } else {
+      this.getter = exprOrFn;
+    }
     this.deps = []; // 存放dep
     this.depsId = new Set(); // 创建一个已经存放dep的标识 避免同一模板多次取值
-
-    this.get(); // 默认初始化 要取值
+    // 第一次渲染时候的value
+    this.value = this.get(); // 默认初始化 要取值
   }
   get() { // 稍后用户更新时 可以重新调用getter方法
     // 这里getter执行就会去data里取值，就会走defineProperty.get
@@ -25,16 +41,25 @@ class Watcher {
     // 同时 一个组件有100个属性 那么100个属性 都属于该组件的watcher 一个watcher 对应 多个属性
     // 既 watcher 和 属性 为多对多的关系 —— 用dep类 来收集这种依赖
     pushTarget(this); // Dep.target = watcher 去之前 先把当前watcher放在全局的Dep.target上
-    this.getter(); // render() 会去vm上取值 vm._update(vm._render)
+    // 
+    const value = this.getter(); // render() 会去vm上取值 vm._update(vm._render)
     popTarget(); // Dep.target = null 如果Dep.target有值 说明这个变量在模板中使用了 防止用户取在实例外的值(取data外的值不刷新组件) 在属性get里做判断
+
+    return value;
   }
   update() {
-    this.get()
+    // this.get()
     // 每次更新时 this指向watcher
     queueWatcher(this); // 多次调用update 我希望将watcher缓存下来 等一会一起更新
   }
   run() {  // 不同的watcher可能执行的get方法不同 所以单独写一个方法调用
-    this.get()
+    let newValue = this.get()
+    let oldValue = this.value;
+
+    this.value = newValue; // 为了保证下一次更新时 上一次的最新值 是下一次更新的老值
+    if (this.user) {
+      this.cb.call(this.vm, newValue, oldValue);
+    }
   }
   addDep(dep) { // 同一模板多次取值 所以 要存放多个dep
     let id = dep.id;
