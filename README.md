@@ -197,13 +197,29 @@ function initData(vm) {
 ## 模板编译
 
 > 数据初始化之后要讲data挂载到el上，所以就需要对el进行模板编译  
-> 把模板转换成渲染函数 => 虚拟dom概念 vnode => diff算法 更新虚拟dom => 产生真实节点 更新  
+> 把模板转换成渲染函数 => 虚拟dom(vnode) => diff算法 更新虚拟dom => 产生真实节点 更新  
 > 以下不考虑用户自写的render函数和template模板，直接解析#app根节点  
 ### 1.解析标签和内容
 
+用户模板模板解析顺序 render——template——el  
 ```js
+if (!vm.$options.render) {  // 用户可能直接写render方法 暂时是没写的情况
+      let template = options.template; // 没有render用template
+      if (!template && el) { // 用户也没有传递template 就去el的内容作为模板
+        template = el.outerHTML;  // 得到模板的字符串  
+        let render = compileToFunction(template)  // 通过编译模块 将得到的模板字符串编译为render函数
+        options.render = render
+      }
+    }
+```
+
+将得到的模板，通过complier模块编译
+```js
+// <div id="app">{{name}}</div>
+
 
 ```
+
 ### 2.形成ast语法树
 ### 3.生成代码
 ### 4.生成render函数

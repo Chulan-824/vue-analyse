@@ -7,40 +7,70 @@
   <title>Document</title>
 </head>
 <body>
-  <div id="app" a="1" style="color:red;background: blue">
-    hello ({{name}}) world
+  <!-- 
+      当在页面直接写fullName时 fullName不会去收集渲染watcher 因为没有dep 没有收集的功能
+      firstName 是在计算属性中使用 所以他会去手机计算属性watcher 没有收集渲染watcher
+      所以计算属性中的值 应该记录 计算属性watcher 和 渲染watcher
+    -->
+    <!-- 首次渲染时 => Dep.target上赋值一个渲染watcher => 渲染时去取fullName值 
+      => 创建computedWatcher => Dep.target 又赋值computedWachter =>fullName的get方法取firstName和lastName
+      => 此时 firstName和lastName 收集的是fullName的computedWacher 并没有收集渲染wachter
+      所以当前firstName和lastName应该要收集渲染watcher和computedWacher 两个watcher
+       -->
+  <div id="app">
+   {{name}} {{fullName}} {{fullName}}
   </div>
   <script src="dist/vue.js"></script>
 
   <script>
     let vm = new Vue({
+      el: '#app',
       data() {
         return {
-          name: '楚岚',
-          age: {
-            n: 1
-          }
+          name: '张楚岚',
+          firstName: '冯',
+          lastName: '宝宝'
         } 
       },
 
-      watch: {
-        name(newV, oldV) {
-          console.log(newV, oldV);
-        },
-        // 'age.n'(){},
-        // name: [function(a,b) {}, function(c, d) {}],
-        // name: 'a'
+      computed: {
+        // fullName() {
+        //   return this.firstName + this.lastName;
+        // },
+        fullName: { //写法二
+          get() {
+            console.log('oooo');
+            return this.firstName + this.lastName;
+          },
+          set(newVal) {
+            console.log(newVal);
+          },
+        }
       },
 
-      method: {
-        a() {},
-      }
-    })
+      // watch: {
+      //   name(newV, oldV) {
+      //     console.log(newV, oldV);
+      //   },
+      //   // 'age.n'(){},
+      //   // name: [function(a,b) {}, function(c, d) {}],
+      //   // name: 'a'
+      // },
 
-    vm.$mount('#app')
+      // method: {
+      //   a() {},
+      // }
+    })
+    console.log(vm.fullName);
+    console.log(vm.fullName);
     setTimeout(() => {
-      vm.name = 'baobao'
+      vm.firstName = 'baobao'
+      console.log(vm.firstName);
     }, 1000)
+
+    /**
+    * 计算属性默认不执行 => Object.defineProperty => getter
+    */
 
     /**
      * watcher 有 渲染watcher 用户wacher(watch) 计算属性watcher

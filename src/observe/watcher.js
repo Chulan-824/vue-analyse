@@ -8,9 +8,11 @@ class Watcher {
     // exprOrFn 之前传的是updateComponent 现在传的是watch里面的key
     this.vm = vm;
     this.exprOrFn = exprOrFn;
+    this.user = !!options.user; // 判断是不是用户watcher
+    this.lazy = !!options.lazy; // 判断是否默认执行一次 根据lazy就可以区分是否是计算属性的watcher
+    this.dirty = options.lazy; // 如果是计算属性 那么默认值lazy:true => dirty: true
     this.cb = cb;
     this.options = options;
-    this.user = !!options.user; // 判断是不是用户watcher
     this.id = id++; // 给watcher增加一个唯一标识
 
     // 默认应该让exprOrFn执行 exprOrFn 方法执行后 调用了render方法 (去vm上取值了)
@@ -32,7 +34,7 @@ class Watcher {
     this.deps = []; // 存放dep
     this.depsId = new Set(); // 创建一个已经存放dep的标识 避免同一模板多次取值
     // 第一次渲染时候的value
-    this.value = this.get(); // 默认初始化 要取值
+    this.value = this.lazy ? undefined : this.get(); // 默认初始化 要取值
   }
   get() { // 稍后用户更新时 可以重新调用getter方法
     // 这里getter执行就会去data里取值，就会走defineProperty.get
@@ -42,7 +44,7 @@ class Watcher {
     // 既 watcher 和 属性 为多对多的关系 —— 用dep类 来收集这种依赖
     pushTarget(this); // Dep.target = watcher 去之前 先把当前watcher放在全局的Dep.target上
     // 
-    const value = this.getter(); // render() 会去vm上取值 vm._update(vm._render)
+    const value = this.getter.call(this.vm); // render() 会去vm上取值 vm._update(vm._render)
     popTarget(); // Dep.target = null 如果Dep.target有值 说明这个变量在模板中使用了 防止用户取在实例外的值(取data外的值不刷新组件) 在属性get里做判断
 
     return value;
@@ -50,7 +52,11 @@ class Watcher {
   update() {
     // this.get()
     // 每次更新时 this指向watcher
-    queueWatcher(this); // 多次调用update 我希望将watcher缓存下来 等一会一起更新
+    if (this.lazy) { // 计算属性更新
+      this.dirty = true;
+    } else {
+      queueWatcher(this); // 多次调用update 我希望将watcher缓存下来 等一会一起更新
+    }
   }
   run() {  // 不同的watcher可能执行的get方法不同 所以单独写一个方法调用
     let newValue = this.get()
@@ -67,6 +73,16 @@ class Watcher {
       this.depsId.add(id);
       this.deps.push(dep);
       dep.addSub(this);
+    }
+  }
+  evaluate() {
+    this.dirty = false; // 为false表示取过值了
+    this.value = this.get(); // 用户的getter执行
+  }
+  depend() {
+    let i = this.deps.length;
+    while (i--) {
+      this.deps[i].depend(); // 取出lastName和firstName的dep 然后再去 收集渲染watcher
     }
   }
 }

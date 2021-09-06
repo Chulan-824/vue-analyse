@@ -20,12 +20,16 @@ let id = 0;
 
 Dep.target = null; // 全局就一份
 
+let stack = []; // 用栈去存放不同的watcher
+
 export function pushTarget(watcher) {
   Dep.target = watcher;
+  stack.push(watcher)
 }
 
 export function popTarget() {
-  Dep.target = null;
+  stack.pop();
+  Dep.target = stack[stack.length - 1];
 }
 
 export default Dep;
