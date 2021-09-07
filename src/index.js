@@ -1,5 +1,6 @@
 // es5中没有类的概念，所以，写原型方法还是要.prototype.=,如果用类写又不符合类的思想(原型方法放在类中定义)
 
+import { initGlobalApi } from "./global-api/index";
 import { initMixin } from "./init";
 import { lifecycleMixin } from "./lifecycle";
 import { renderMixin } from "./render";
@@ -16,5 +17,8 @@ initMixin(Vue);
 renderMixin(Vue);  // _render
 lifecycleMixin(Vue);  // _update
 stateMixin(Vue); // 状态合并
+
+// 在类上扩展 Vue.mixin
+initGlobalApi(Vue)
 
 export default Vue

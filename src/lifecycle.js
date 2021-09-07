@@ -25,9 +25,20 @@ export function mountComponent(vm, el) {
   
   // 观察者模式 属性:被观察者 观察者:刷新页面 —— 所以需要创建一个观察者
   // 观察者模式:被动更新 属性变=>更新 发布订阅模式:主动更新 属性变=>需通知更新
+  callHook(vm, 'beforeMount')
   new Watcher(vm, updateComponent, () => {
     console.log('自定义callback 属性更新了!');
   }, true); // 第4个参数为标识 表示是否是一个渲染watcher 后续还会有其他的watcher
 
   //updateComponent(); // 第一次挂载 需要先执行一次
+}
+
+// 调用钩子函数
+export function callHook(vm, hook) { // 哪个钩子实例 哪个钩子函数
+  let handlers = vm.$options[hook];
+  if (handlers) {
+    for (let i = 0; i < handlers.length; i++) {
+      handlers[i].call(vm);
+    }
+  }
 }

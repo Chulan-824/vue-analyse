@@ -1,15 +1,20 @@
 import { compileToFunction } from "./compiler/index.js";
-import { mountComponent } from "./lifecycle.js";
+import { callHook, mountComponent } from "./lifecycle.js";
 import { initState } from "./state";
+import { mergeOptions } from "./utils.js";
 
 // 关于初始化的方法扩展，单独放该文件定义
 export function initMixin(Vue) {  // 表示在vue的基础上做一次混合操作
   Vue.prototype._init = function(options) {
     const vm = this; // this指向Vue实例 类似于 var self = this 方便后续实例的使用
-    vm.$options = options // 将options挂到vm实例上  后续会对options选项进行扩展
+    
+    // 这里this.constructor代替Vue 如果Vue写死了 之后写子组件就不能找到对应组件的选项
+    vm.$options = mergeOptions(this.constructor.options, options) // 将options挂到vm实例上  后续会对options选项进行扩展
 
+    callHook(vm, 'beforeCreate')
     // 对数据进行初始化 props data computed  watch ... 对数据操作单独提取到state.js文件里
     initState(vm)  // 数据劫持
+    callHook(vm, 'created')
 
     if (vm.$options.el) {  // 如果有el 要讲数据挂在到el节点上
       vm.$mount(vm.$options.el);

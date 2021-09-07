@@ -18,35 +18,47 @@
       所以当前firstName和lastName应该要收集渲染watcher和computedWacher 两个watcher
        -->
   <div id="app">
-   {{name}} {{fullName}} {{fullName}}
+    <my-button><my-button>
   </div>
+  <!-- <script src="https://cdn.bootcss.com/vue/2.5.2/vue.min.js"></script> -->
   <script src="dist/vue.js"></script>
 
   <script>
-    let vm = new Vue({
-      el: '#app',
-      data() {
-        return {
-          name: '张楚岚',
-          firstName: '冯',
-          lastName: '宝宝'
-        } 
-      },
+    // 混入-生命周期执行顺序：内部会将钩子函数 回调函数 存在一个数组里，当达到某个阶段后依次执行
+    // mixin的配置会统一存在Vue.option = {beforeCreate:[fn1,fn2]}
+    // Vue.mixin({
+    //   beforeCreate() {
+    //     console.log('before create 1');
+    //   }
+    // })
 
-      computed: {
-        // fullName() {
-        //   return this.firstName + this.lastName;
-        // },
-        fullName: { //写法二
-          get() {
-            console.log('oooo');
-            return this.firstName + this.lastName;
-          },
-          set(newVal) {
-            console.log(newVal);
-          },
-        }
-      },
+    // Vue.mixin({
+    //   beforeCreate() {
+    //     console.log('before create 2');
+    //   }
+    // })
+
+    let vm = new Vue({ // vm.$options.beforeCreate:[fn1,fn2] 然后和Vue.options.beforeCreate进行合并
+      el: '#app',
+      
+      // beforeCreate() {
+      //   console.log('before create 3');
+      // }
+
+      // computed: {
+      //   // fullName() {
+      //   //   return this.firstName + this.lastName;
+      //   // },
+      //   fullName: { //写法二
+      //     get() {
+      //       console.log('oooo');
+      //       return this.firstName + this.lastName;
+      //     },
+      //     set(newVal) {
+      //       console.log(newVal);
+      //     },
+      //   }
+      // },
 
       // watch: {
       //   name(newV, oldV) {
@@ -61,12 +73,14 @@
       //   a() {},
       // }
     })
-    console.log(vm.fullName);
-    console.log(vm.fullName);
-    setTimeout(() => {
-      vm.firstName = 'baobao'
-      console.log(vm.firstName);
-    }, 1000)
+
+
+    // console.log(vm.fullName);
+    // console.log(vm.fullName);
+    // setTimeout(() => {
+    //   vm.firstName = 'baobao'
+    //   console.log(vm.firstName);
+    // }, 1000)
 
     /**
     * 计算属性默认不执行 => Object.defineProperty => getter
